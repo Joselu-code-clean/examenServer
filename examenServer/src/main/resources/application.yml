@@ -1,0 +1,12 @@
+server:
+  port: 8888
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Joselu-code-clean/ConfigParaRetoEureka.git
+          default-label: main
+          search-paths:
+            - '*service'

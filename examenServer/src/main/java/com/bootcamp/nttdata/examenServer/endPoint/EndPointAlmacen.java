@@ -2,7 +2,6 @@ package com.bootcamp.nttdata.examenServer.endPoint;
 
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -37,7 +36,7 @@ public class EndPointAlmacen {
 	}
 	
 	@ReadOperation
-	public List<Producto> mostrarAlmacen() {
+	public List<Producto> consultarAlmacen() {
 		counter1.increment();
 		if(!almacen.getAlmacen().isEmpty()) {
 			return almacen.getAlmacen();

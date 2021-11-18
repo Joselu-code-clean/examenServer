@@ -1,0 +1,102 @@
+COSAS QUE NECESITA EL PROYECTO:
+Spring Cloud: ok
+	Cliente y Servidor
+Starter: ok
+eureka: ok
+Micrometer: ok
+Actuator: ok
+Prometheus: ok
+Patrones de Diseño: Builder y Singleton: ok
+Logs: No
+Programacion Funcional: ok "Main del cliente"
+*******************************************************************************
+
+Enunciado:
+	* Es como un CRUD:
+		* Controller del cliente: las peticiones para añadir, eliminar o consultar
+		* Server: EndPoint para retocar la lista, eureka.
+		* Starter que contendra la base de datos que sera una lista y tendremos los metodos para modificarla.
+	* Crear paradigma propio, crear una lista de cliente y jugar con ella.
+	* Tener un listado que pueda añadir, eliminar y leer.
+	* Opcional: CircuitBreaker.-> No veo donde implementarlo en este ejercicio....
+
+*********************************************************************************
+
+PLANTEAMIENTO:
+	* Cliente
+		* Dependencias: Starter web, Spring client
+		* Creamos Builder para la clases que haremos [Producto]
+		* Controller/Servicio llama a los endpoints 
+
+	* Server
+		* Dependencias:Starter Web, Spring Server
+		* Inyectamos el starter
+		* Inyectamos el actuator y micromether y eureka.
+		* Endpoints
+
+	* Starter: Mas o menos hecho...
+		* Logica con propiedades:
+			* Almacen de productos
+			* SingletonAlmacen: Solo puede haber un almacen, simulamos una base de datos.
+		* Autoconfigure: ok
+		* Properties: ok
+		* META-INF: spring.factories: ok
+
+****************************************************************************************
+
+ORDEN DE TRABAJO:
+1º Configuramos el Spring Cloud
+	* Server: Puerto 8888: -> aplication.yml ok
+	* Cliente: Puerto 8081: -> bootstrap.yml ok
+
+2º Creamos el Starter
+	* POM: LISTO
+	* Logica creada:
+		* Almacen: Contiene la lista de productos y los metodos para consultarla, insertar y eliminarla
+		* AlmacenAutoConfigure:La configuracion para comunicar el dto(Almacen) con properties y el proyecto que lo inyecte.
+		* AlmacenProperties: La clase de configuracion para obtener las propiedades del contexto, en nuestro caso pasaremos productos.
+		* Producto: Necesitamos la clase producto para poder hacer una lista de productos en el almacen.
+
+3º Implementamos el Starter segun el enunciado: Cliente o Server: En nuestro caso en el server.
+
+4º Creamos los EndPoints en el servidor.
+
+5º Creamos toda la logica en el cliente y el controller con las peticiones.
+	*RECUERDA:
+		* Get.
+		* Put.
+	*OPCIONAL: Como último podemos añadir los Logs.
+
+ ********************************************************************************************
+
+ERRORES:
+	SERVER:
+		* Cuando quiero añadir el fichero application.properties en src/main/resources, el pom me da un error porque al parecer
+		no pueden estar dos ficheros que se llamen application... Y necesito el otro fichero application para configurar el servidor..
+		no he hayado el problema. Con lo cual no he podido probar las peticiones...
+		* POSIBLE SOLUCION: Creo recordar que se pueden renombrar esos ficheros con el siguiente patron pero aun asi no me funciona: application-(loquesea).yml
+		[[[ESTUVE DESDE LAS 13:00 SIN CONSEGUIR ESTO... CON LO CUAL EL MAYOR TIEMPO DEL RETO LO HE GASTADO AQUI...]]]	
+		* SOLUCION: Me faltaba la configuracion en las properties de eureka. Hora: 13:53.
+		
+		* No se que he modificado, pero cuando lanzo el servidor, me salta el siguiente error:
+		Field almacen in com.bootcamp.nttdata.examenServer.endPoint.EndPointAlmacen required a bean of type 'com.bootcamp.nttdata.examenStarter.Almacen' that could not be found.
+		*CONCLUSION: Es a la hora de hacer el @Autowired para inyectar la propiedad almacen de la clase AlmacenAutoConfigure que retorna un Almacen, pero al parecer ahora no la reconoce..
+		*POSIBLE SOLUCION: El @Bean lo tengo implementado en la clase AlmacenAutoConfigure, antes no me fallaba, no se que he tocado... hora: 14:16.
+		*SOLUCION: Al final creia que tenia la anotacion @Bean que lo puse pero no se como se borro y porfin funciona... he perdido de tiempo con esta tonteria... 14:26
+				
+	CLIENTE:
+		* Metodo: consultarAlmacen() -> No funciona.. quiero retornar la lista pero no sé si lo tengo que parsear en JSON y despues obtener los objetos desde ahi
+		o habria una forma de conseguir el listado de objetos.
+
+		*Metodo al insertarProducto() -> I/O error on POST request for "http://localhost:8888/actuator/almacen/com.bootcamp.nttdata.examenCliente.models.Producto@22d9ca63": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+		CONCLUSION: La peticion no lo hace bien ya que el RestController casi seguro que no lo tengo bien implementado...
+
+CONCLUSION DEL PROYECTO (te lo escribo ya que no me ha salido y creo que sé el por qué)
+* Los RestController el concepto de los controller lo tengo aun muy verde, como hacer bien una peticion ya sea por GET o POST, ya que despues meto el servicio con ResponseEntity y es cuando me pierdo.. tengo nociones pero no lo tengo bien implementado
+* Concepto de Cloud en general no lo tengo entendido bien.
+* Starter si lo he entendido bien
+* Eureka y Actuator tambien lo tengo entendidos, el problemas que he mezclado concepto del Server de Spting cloud y lo he implementado con eureka pero creo que en un microservicio deberian ir juntos, no?
+SOLUCION:
+* Yo he estado con los proyectos mios de la bootcamp por la tarde, para intentarlos tenerlo bien, pero aun asi esto me ha venido grande ya que la base de algunos conceptos clave lo tenia verde, por lo cual
+la mejor solucion es hacer este mismo proyecto tranquilo y bien, y por tanto anotarlo todo como funciona y comprender el comportamiento de todo, ya es tarde,
+pero con todo lo aprendido me veo con una base para hacerlo por mi cuenta y quitarme esta espinita para el dia de mañana!!
